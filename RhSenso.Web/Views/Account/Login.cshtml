@@ -1,0 +1,18 @@
+@model LoginViewModel
+@{ ViewData["Title"] = "Acesso CEO"; }
+<div class="auth-page">
+  <div class="auth-card">
+    <a href="/" class="auth-brand"><span>RH</span>SENSO</a>
+    <span class="eyebrow">ÁREA RESTRITA</span>
+    <h1>Acesso CEO</h1>
+    <p>Entre com suas credenciais administrativas.</p>
+    <form method="post">
+      <div asp-validation-summary="ModelOnly" class="validation"></div>
+      <label asp-for="Email"></label><input asp-for="Email" autocomplete="username"><span asp-validation-for="Email" class="validation"></span>
+      <label asp-for="Password"></label><input asp-for="Password" autocomplete="current-password"><span asp-validation-for="Password" class="validation"></span>
+      <label class="checkline"><input asp-for="RememberMe"> <span>Manter conectado</span></label>
+      <button class="btn auth-submit" type="submit">Entrar</button>
+    </form>
+    <a class="auth-back" href="/">← Voltar para o site</a>
+  </div>
+</div>

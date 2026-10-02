@@ -1,0 +1,645 @@
+﻿@model RhSenso.Web.ViewModels.Analytics.AnalyticsDashboardViewModel
+
+@{
+    ViewData["Title"] = "Analytics";
+
+    string FormatDate(DateTime date)
+    {
+        return date.ToLocalTime().ToString("dd/MM/yyyy HH:mm");
+    }
+}
+
+<style>
+
+    .analytics-page {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 40px 24px 70px;
+    }
+
+    .analytics-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+        margin-bottom: 32px;
+    }
+
+    .analytics-header h1 {
+        margin: 0 0 6px;
+        font-size: 32px;
+        color: #172033;
+    }
+
+    .analytics-header p {
+        margin: 0;
+        color: #6b7280;
+    }
+
+    .back-button {
+        text-decoration: none;
+        padding: 11px 18px;
+        border: 1px solid #d9dee8;
+        border-radius: 9px;
+        color: #374151;
+        font-weight: 600;
+        background: #fff;
+    }
+
+    .back-button:hover {
+        background: #f5f7fa;
+    }
+
+
+    /* FILTROS */
+
+    .analytics-filters {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 25px;
+    }
+
+    .analytics-filters span {
+        margin-right: 5px;
+        color: #6b7280;
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+    .filter-button {
+        text-decoration: none;
+        padding: 8px 14px;
+        border-radius: 8px;
+        border: 1px solid #d8dee9;
+        background: #fff;
+        color: #475569;
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+    .filter-button:hover {
+        background: #f5f7fa;
+    }
+
+    .filter-button.active {
+        background: #2563eb;
+        border-color: #2563eb;
+        color: #fff;
+    }
+
+
+    /* CARDS PRINCIPAIS */
+
+    .analytics-cards {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 18px;
+        margin-bottom: 18px;
+    }
+
+    .analytics-card {
+        background: #fff;
+        border: 1px solid #e6e9ef;
+        border-radius: 14px;
+        padding: 22px;
+        box-shadow: 0 3px 12px rgba(0,0,0,.04);
+    }
+
+    .analytics-card-label {
+        color: #6b7280;
+        font-size: 14px;
+        margin-bottom: 10px;
+    }
+
+    .analytics-card-value {
+        font-size: 34px;
+        font-weight: 800;
+        color: #172033;
+        line-height: 1;
+    }
+
+    .analytics-card-detail {
+        margin-top: 10px;
+        color: #94a3b8;
+        font-size: 12px;
+    }
+
+
+    /* INDICADORES */
+
+    .analytics-secondary {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 18px;
+        margin-bottom: 28px;
+    }
+
+    .secondary-card {
+        background: #f8fafc;
+        border: 1px solid #e6e9ef;
+        border-radius: 12px;
+        padding: 17px 20px;
+    }
+
+    .secondary-value {
+        font-size: 21px;
+        font-weight: 800;
+        color: #172033;
+    }
+
+    .secondary-label {
+        color: #64748b;
+        font-size: 13px;
+        margin-top: 4px;
+    }
+
+
+    /* PAINÉIS */
+
+    .analytics-panels {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        margin-bottom: 20px;
+    }
+
+    .analytics-panel {
+        background: #fff;
+        border: 1px solid #e6e9ef;
+        border-radius: 14px;
+        overflow: hidden;
+        box-shadow: 0 3px 12px rgba(0,0,0,.035);
+    }
+
+    .analytics-panel-header {
+        padding: 18px 20px;
+        border-bottom: 1px solid #edf0f4;
+        font-weight: 700;
+        color: #172033;
+        font-size: 16px;
+    }
+
+    .analytics-panel-body {
+        padding: 10px 20px;
+    }
+
+
+    /* TABELAS */
+
+    .analytics-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .analytics-table th {
+        text-align: left;
+        color: #64748b;
+        font-size: 12px;
+        font-weight: 600;
+        padding: 13px 12px;
+        border-bottom: 1px solid #edf0f4;
+        white-space: nowrap;
+    }
+
+    .analytics-table td {
+        padding: 14px 12px;
+        border-bottom: 1px solid #f0f2f5;
+        color: #374151;
+        font-size: 14px;
+    }
+
+    .analytics-table tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    .analytics-table tbody tr:hover {
+        background: #fafbfc;
+    }
+
+    .analytics-count {
+        text-align: right;
+        font-weight: 700;
+        color: #172033 !important;
+    }
+
+    .analytics-center {
+        text-align: center;
+    }
+
+    .empty-data {
+        padding: 25px 0;
+        text-align: center;
+        color: #94a3b8;
+    }
+
+
+    /* SESSÕES */
+
+    .sessions-panel {
+        margin-top: 20px;
+    }
+
+    .sessions-table-wrapper {
+        overflow-x: auto;
+    }
+
+    .source-text {
+        max-width: 350px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+
+    /* RESPONSIVO */
+
+    @@media (max-width: 1000px) {
+
+        .analytics-cards,
+        .analytics-secondary {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .analytics-panels {
+            grid-template-columns: 1fr;
+        }
+
+    }
+
+    @@media (max-width: 600px) {
+
+        .analytics-page {
+            padding: 25px 15px 50px;
+        }
+
+        .analytics-header {
+            align-items: flex-start;
+            flex-direction: column;
+        }
+
+        .analytics-cards,
+        .analytics-secondary {
+            grid-template-columns: 1fr;
+        }
+
+    }
+
+</style>
+
+
+<div class="analytics-page">
+
+    <!-- CABEÇALHO -->
+
+    <div class="analytics-header">
+
+        <div>
+            <h1>Analytics</h1>
+            <p>
+                Comportamento dos visitantes do site
+            </p>
+        </div>
+
+        <a href="/admin"
+           class="back-button">
+            ← Voltar ao painel
+        </a>
+
+    </div>
+
+
+    <!-- FILTRO -->
+
+    <div class="analytics-filters">
+
+        <span>Período</span>
+
+        <a href="/admin/analytics?days=7"
+           class="filter-button @(Model.Days == 7 ? "active" : "")">
+            7 dias
+        </a>
+
+        <a href="/admin/analytics?days=30"
+           class="filter-button @(Model.Days == 30 ? "active" : "")">
+            30 dias
+        </a>
+
+        <a href="/admin/analytics?days=90"
+           class="filter-button @(Model.Days == 90 ? "active" : "")">
+            90 dias
+        </a>
+
+        <a href="/admin/analytics?days=365"
+           class="filter-button @(Model.Days == 365 ? "active" : "")">
+            1 ano
+        </a>
+
+    </div>
+
+
+    <!-- CARDS -->
+
+    <div class="analytics-cards">
+
+        <div class="analytics-card">
+
+            <div class="analytics-card-label">
+                Visitantes
+            </div>
+
+            <div class="analytics-card-value">
+                @Model.Visitors
+            </div>
+
+            <div class="analytics-card-detail">
+                visitantes únicos no período
+            </div>
+
+        </div>
+
+
+        <div class="analytics-card">
+
+            <div class="analytics-card-label">
+                Sessões
+            </div>
+
+            <div class="analytics-card-value">
+                @Model.Sessions
+            </div>
+
+            <div class="analytics-card-detail">
+                acessos registrados
+            </div>
+
+        </div>
+
+
+        <div class="analytics-card">
+
+            <div class="analytics-card-label">
+                Visualizações
+            </div>
+
+            <div class="analytics-card-value">
+                @Model.PageViews
+            </div>
+
+            <div class="analytics-card-detail">
+                páginas visualizadas
+            </div>
+
+        </div>
+
+
+        <div class="analytics-card">
+
+            <div class="analytics-card-label">
+                Cliques
+            </div>
+
+            <div class="analytics-card-value">
+                @Model.Clicks
+            </div>
+
+            <div class="analytics-card-detail">
+                interações registradas
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- INDICADORES -->
+
+    <div class="analytics-secondary">
+
+        <div class="secondary-card">
+            <div class="secondary-value">
+                @Model.NewVisitors
+            </div>
+            <div class="secondary-label">
+                Novos visitantes
+            </div>
+        </div>
+
+
+        <div class="secondary-card">
+            <div class="secondary-value">
+                @Model.ReturningVisitors
+            </div>
+            <div class="secondary-label">
+                Visitantes recorrentes
+            </div>
+        </div>
+
+
+        <div class="secondary-card">
+            <div class="secondary-value">
+                @Model.PagesPerSession.ToString("0.00")
+            </div>
+            <div class="secondary-label">
+                Páginas por sessão
+            </div>
+        </div>
+
+
+        <div class="secondary-card">
+            <div class="secondary-value">
+                @Model.ClicksPerSession.ToString("0.00")
+            </div>
+            <div class="secondary-label">
+                Cliques por sessão
+            </div>
+        </div>
+
+    </div>
+
+
+    <!-- RANKINGS -->
+
+    <div class="analytics-panels">
+
+        <!-- PÁGINAS -->
+
+        <div class="analytics-panel">
+
+            <div class="analytics-panel-header">
+                Páginas mais visitadas
+            </div>
+
+            <div class="analytics-panel-body">
+
+                @if (!Model.TopPages.Any())
+                {
+                    <div class="empty-data">
+                        Nenhum dado disponível.
+                    </div>
+                }
+                else
+                {
+                    <table class="analytics-table">
+
+                        <tbody>
+
+                            @foreach (var item in Model.TopPages)
+                            {
+                                <tr>
+
+                                    <td>
+                                        @item.Name
+                                    </td>
+
+                                    <td class="analytics-count">
+                                        @item.Count
+                                    </td>
+
+                                </tr>
+                            }
+
+                        </tbody>
+
+                    </table>
+                }
+
+            </div>
+
+        </div>
+
+
+        <!-- CLIQUES -->
+
+        <div class="analytics-panel">
+
+            <div class="analytics-panel-header">
+                Links mais clicados
+            </div>
+
+            <div class="analytics-panel-body">
+
+                @if (!Model.TopClicks.Any())
+                {
+                    <div class="empty-data">
+                        Nenhum clique registrado.
+                    </div>
+                }
+                else
+                {
+                    <table class="analytics-table">
+
+                        <tbody>
+
+                            @foreach (var item in Model.TopClicks)
+                            {
+                                <tr>
+
+                                    <td>
+                                        @item.Name
+                                    </td>
+
+                                    <td class="analytics-count">
+                                        @item.Count
+                                    </td>
+
+                                </tr>
+                            }
+
+                        </tbody>
+
+                    </table>
+                }
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- SESSÕES -->
+
+    <div class="analytics-panel sessions-panel">
+
+        <div class="analytics-panel-header">
+            Últimas sessões
+        </div>
+
+        <div class="sessions-table-wrapper">
+
+            <table class="analytics-table">
+
+                <thead>
+
+                    <tr>
+                        <th>Início</th>
+                        <th>Página inicial</th>
+                        <th>Origem</th>
+                        <th>Dispositivo</th>
+                        <th class="analytics-center">
+                            Páginas
+                        </th>
+                        <th class="analytics-center">
+                            Cliques
+                        </th>
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    @if (!Model.RecentSessions.Any())
+                    {
+                        <tr>
+                            <td colspan="6"
+                                class="empty-data">
+                                Nenhuma sessão encontrada.
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        @foreach (var session in Model.RecentSessions)
+                        {
+                            <tr>
+
+                                <td>
+                                    @FormatDate(session.StartedAt)
+                                </td>
+
+                                <td>
+                                    @session.LandingPage
+                                </td>
+
+                                <td class="source-text"
+                                    title="@session.Referrer">
+                                    @session.Referrer
+                                </td>
+
+                                <td>
+                                    @session.DeviceType
+                                </td>
+
+                                <td class="analytics-center">
+                                    @session.PageViews
+                                </td>
+
+                                <td class="analytics-center">
+                                    @session.Clicks
+                                </td>
+
+                            </tr>
+                        }
+                    }
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
